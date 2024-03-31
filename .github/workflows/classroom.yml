@@ -1,0 +1,36 @@
+name: Autograding Tests
+'on':
+- push
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Practical8
+      id: practical8
+      uses: education/autograding-io-grader@v1
+      with:
+        test-name: Practical8
+        setup-command: ''
+        command: javac Practical8.java && java Practical8
+        input: ''
+        expected-output: "Species: Lion, Age: 5\r\nSpecies: Eagle, Age: 3\r\nSpecies:
+          Talking Parrot, Age: 2\r\nAre lion and eagle equal? false\r\nAre lion and
+          lion equal? true\r\n"
+        comparison-method: exact
+        timeout: 10
+        max-score: 10
+    - name: Autograding Reporter
+      uses: education/autograding-grading-reporter@v1
+      env:
+        PRACTICAL8_RESULTS: "${{steps.practical8.outputs.result}}"
+      with:
+        runners: practical8
